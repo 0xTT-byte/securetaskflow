@@ -1,0 +1,28 @@
+# docker-compose.yml
+# defines all the services (containers) that make up the app
+services:
+
+  # redis acts as the message broker between FastAPI and Celery workers
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  # the FastAPI web app itself
+  app:
+    build: .                     # build from the Dockerfile in this folder
+    ports:
+      - "8000:8000"              # expose port 8000 so we can curl it
+    environment:                 # <-- must be spelled exactly like this
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:                  # <-- must be spelled exactly like this
+      - redis                    # don't start app until redis is up
+
+  # the celery worker that actually processes tasks in the background
+  worker:
+    build: .
+    command: celery -A app.worker worker --loglevel=info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
