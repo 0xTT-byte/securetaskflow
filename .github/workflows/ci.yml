@@ -1,0 +1,46 @@
+name: CI 
+
+# run on every push to main/master and on PRs
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    # grant the built-in GITHUB_TOKEN permission to push pakages to GHCR 
+    permissions:
+      contents: read 
+      packeges: write
+
+    env: 
+      IMAGE_NAME: securetaskflow-app
+      IMAGE_TAG: ${{ github.run_number }} # GHA's equivalent of jenkins' BUILD_NUMBER
+      GHCR_REPO: ghcr.io/0xtt-byte/securtaskflow # adjust to your actual lowercase GHCR path 
+    
+    steps:
+      # mirror of jenkins 'Checkout'
+      - name: Checkout 
+        uses: actions/checkout@v4 
+# mirror of Jenkins 'Build'
+      - name: Build image
+        run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+      # mirror of Jenkins 'Test'
+      - name: Test
+        run: docker run --rm $IMAGE_NAME:$IMAGE_TAG pytest tests/ -v
+
+      # mirror of Jenkins 'Lint'
+      - name: Lint
+        run: docker run --rm $IMAGE_NAME:$IMAGE_TAG ruff check app/
+
+      # mirror of Jenkins 'Push' — uses built-in GITHUB_TOKEN, no PAT needed
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push to GHCR
+        run: |
+          docker tag $IMAGE_NAME:$IMAGE_TAG $GHCR_REPO:$IMAGE_TAG
+          docker push $GHCR_REPO:$IMAGE_TAG
