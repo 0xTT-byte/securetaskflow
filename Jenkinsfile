@@ -5,7 +5,7 @@ pipeline {
     environment {
         IMAGE_NAME = "securetaskflow-app"
         IMAGE_TAG  = "${BUILD_NUMBER}"
-        GHCR_REPO  = "ghcr.io/admin/securetaskflow"  // adjust to your actual GHCR path
+        GHCR_REPO  = "ghcr.io/0xTT-byte/securetaskflow"  // adjust to your actual GHCR path
     }
 
     stages {
