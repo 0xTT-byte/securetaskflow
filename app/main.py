@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.worker import process_task 
-import uuid, os 
+import uuid
 
 app = FastAPI(title="SecureTaskFlow")
 

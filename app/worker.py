@@ -1,5 +1,6 @@
 from celery import Celery
-import os, time 
+import os
+import time
 
 app = Celery(
         "tasks", 

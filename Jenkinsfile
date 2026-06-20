@@ -24,7 +24,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'docker run --rm ${IMAGE_NAME}:${IMAGE_TAG} pytest tests/ -v'
+                sh 'docker run --rm ${IMAGE_NAME}:${IMAGE_TAG} python -m pytest tests/ -v'
             }
         }
 
