@@ -8,7 +8,7 @@ app = FastAPI(title="SecureTaskFlow")
 def submit_task(payload: dict):
     task_id = str(uuid.uuid4())
     process_task.apply_async(args=[task_id, payload], task_id=task_id)
-    return {"task_id": task_id, "status": "processing"}
+    return {"task_id": task_id, "status": "queued"}
 
 @app.get("/task/{task_id}/status") 
 def get_status(task_id: str):
