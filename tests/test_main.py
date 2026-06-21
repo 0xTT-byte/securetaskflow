@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 from app.main import app
-from unittes.mock import patch
+from unittest.mock import patch
 client = TestClient(app)
 
 @patch("app.main.process_task")     # swap the real Celery task for mock, only inside app.main
@@ -8,7 +8,7 @@ def test_submit_task_returns_task_id(mock_process):
     response = client.post("/task", json={"foo": "bar"})
 
     assert response.status_code == 200
-    body = rsponse.json()
+    body = response.json()
     assert "task_id" in body        # endpoint must hand back an id 
     assert body["status"] == "queued"
     mock_process.apply_async.assert_called_once()       # prove it tried to equeue, without real Redis
